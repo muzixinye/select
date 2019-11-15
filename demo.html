@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<body>
+		<br /><br /><br /><br /><br />
+		<select id="sele1">
+			<option>请选择市场</option>
+		</select>
+		<select id="sele2">
+			<option>请选择品种</option>
+		</select>
+		<select id="sele3">
+			<option>请选择材质</option>
+		</select>
+		<select id="sele4">
+			<option>请选择规格</option>
+		</select>
+		<select id="sele5">
+			<option>请选择钢厂</option>
+		</select>
+		<script src="js/ajax.js"></script>
+		<script type="text/javascript">
+			function select(dom,num,tip){
+				this.dom=document.getElementById(dom)
+				this.lv=num
+				this.tip=tip
+				this.init(dom)
+			}
+			select.prototype={
+				init:function(dom){
+					console.log('我是'+dom+'组件')
+				},
+				appendOption:function(data){
+					insertDom = this.dom
+					for(var i = 0; i < data.length; i++){
+						// 遍历所有选项名称
+						var optName = data[i].name;
+						// 生成一个option标签
+						var opt = document.createElement('option');
+						// 将选项放到标签中
+						opt.innerHTML = optName;
+						// 将option标签放到select标签中
+						insertDom.appendChild(opt);
+					}
+					//绑定监听change事件
+					this.watchChange(selArrObj[this.lv+1],data)
+				},
+				watchChange:function(nextDom,data){
+					console.log(nextDom,data)
+					var _this = this 
+					this.dom.onchange=function(){
+						selectVal = this.value
+						for(var i = 0; i < data.length; i++){
+							// 判断该级别数据中是否有自己选择的值
+							if(data[i].name ==selectVal  && data[i].sunList){
+								// 如果有清空低级别的select中原有的信息
+								for(var j=nextDom.lv;j<selArrObj.length;j++){
+									selArrObj[j].dom.innerHTML = "<option>"+selArrObj[j].tip+"</option>";
+								}
+								// 获取下一级别的数据塞入下一级别的option中
+								var nextData = data[i].sunList;
+								nextDom.appendOption(nextData)
+							}
+						}
+					}
+				}
+			}
+			
+			var selArrObj = [
+				new select('sele1',0,'请选择市场'),
+				new select('sele2',1,'请选择品种'),
+				new select('sele3',2,'请选择材质'),
+				new select('sele4',3,'请选择规格'),
+				new select('sele5',4,'请选择钢厂'),
+			]
+			ajax("GET", "data/template.json", function (data){
+				// 解析服务器返回的数据，放在公共的allData变量中
+				selArrObj[0].appendOption(JSON.parse(data))
+			});
+
+		</script>
+	</body>
+</html>

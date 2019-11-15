@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<body>
+		<input type="button" id="btn" value="加载"  />
+		<select id="sele1">
+			<option>请选择省份</option>
+		</select>
+		<select id="sele2">
+			<option>请选择地市</option>
+		</select>
+		<select id="sele3">
+			<option>请选择区县</option>
+		</select>
+		
+		<script src="js/ajax.js"></script>
+		<script type="text/javascript">
+			window.onload = function (){ 
+				var allData;
+				var btn = document.getElementById('btn');
+				btn.onclick = function (){
+					
+					ajax("GET", "data/allCity.json", function (data){
+						// 解析服务器返回的数据，放在公共的allData变量中
+						allData = JSON.parse(data);
+						showProv();
+					});
+				}
+				
+				function showProv(){
+					// 获取第一个select标签
+					var sele1 = document.getElementById('sele1');
+					
+					// 拿到存放每个省份对象的数组
+					var provinces = allData.regions;
+					// 遍历所有省份
+					for(var i = 0; i < provinces.length; i++){
+						// 获取省份的名称
+						var provName = provinces[i].name;
+						// 生成一个option标签
+						var opt = document.createElement('option');
+						// 将省份名称放到标签中
+						opt.innerHTML = provName;
+						// 将option标签放到第一个select标签中
+						sele1.appendChild(opt);
+					}
+					
+					sele1.onchange = function (){
+						// 获取第三个select标签
+						var sele3 = document.getElementById('sele3');
+						// 清空第三个select中原有的区县信息
+						sele3.innerHTML = "<option>请选择区县</option>";
+						//console.log(this.value);
+						showCity(this.value);
+					}
+				}
+				
+				function showCity(prov){
+					// 获取第二个select标签
+					var sele2 = document.getElementById('sele2');
+					
+					// 拿到存放每个省份对象的数组
+					var provinces = allData.regions;
+					// 遍历
+					for(var i = 0; i < provinces.length; i++){
+						// 获取省份的名称
+						var provName = provinces[i].name;
+						// 判断是不是想要的那个省份
+						if(provName == prov && provinces[i].regions){
+							// 清空第二个select中的地市信息
+							sele2.innerHTML = "<option>请选择地市</option>";
+							// 获取该省份下所有地市的数组
+							var cities = provinces[i].regions;
+							// 遍历所有地市
+							for(var j = 0; j < cities.length; j++){
+								// 拿到地市名
+								var cityName = cities[j].name;
+								// 生成一个option
+								var opt = document.createElement('option');
+								opt.innerHTML = cityName;
+								// 将该option标签放到sele2中
+								sele2.appendChild(opt);
+							}
+							break;							
+						}
+					}
+					
+					sele2.onchange = function (){
+						//showCountry(prov, this.value);
+						// 简化方案，第一参数，直接选择将已经找出来的该省份下的所有地市的数组传入
+						// 而不是传入一个省份的名称，这样一来就不需要第一层循环了
+						showCountry2(cities, this.value);
+					}
+				}
+				
+				function showCountry2(cities, city){
+					// 获取第三个select标签
+					var sele3 = document.getElementById('sele3');
+					
+					for(var j = 0; j < cities.length; j++){
+						// 获取地市的名称
+						var cityName = cities[j].name;
+						// 判断该地市是否是想要的那个地市
+						if(cityName == city){
+							// 清空第三个select中原有的区县信息
+							sele3.innerHTML = "<option>请选择区县</option>";
+							// 获取该市所有区县信息的数组
+							var countries = cities[j].regions;
+							// 遍历所有的区县
+							for(var k = 0; k < countries.length; k++){
+								// 获取某个区县的名称
+								var countryName = countries[k].name;
+								// 生成一个option
+								var opt = document.createElement('option');
+								opt.innerHTML = countryName;
+								// 将该option放到第三个select中
+								sele3.appendChild(opt);
+							}
+							break;
+						}
+					}
+				}
+				
+				
+				function showCountry(prov, city){
+					// 获取第三个select标签
+					var sele3 = document.getElementById('sele3');
+					
+					// 拿到存放每个省份对象的数组
+					var provinces = allData.regions;
+					// 遍历所有的省份
+					for(var i = 0; i < provinces.length; i++){
+						var provName = provinces[i].name;
+						if(provName == prov){
+							var cities = provinces[i].regions;
+							for(var j = 0; j < cities.length; j++){
+								// 获取地市的名称
+								var cityName = cities[j].name;
+								// 判断该地市是否是想要的那个地市
+								if(cityName == city){
+									// 清空第三个select中原有的区县信息
+									sele3.innerHTML = "<option>请选择区县</option>";
+									// 获取该市所有区县信息的数组
+									var countries = cities[j].regions;
+									// 遍历所有的区县
+									for(var k = 0; k < countries.length; k++){
+										// 获取某个区县的名称
+										var countryName = countries[k].name;
+										// 生成一个option
+										var opt = document.createElement('option');
+										opt.innerHTML = countryName;
+										// 将该option放到第三个select中
+										sele3.appendChild(opt);
+									}
+									break;
+								}
+							}
+							break;
+						}
+					}
+					
+				}
+				
+				
+				
+			}
+		
+			/*
+			  allData = {
+			  	
+			  	regions : {
+			  		
+			  		{
+			  			name: "浙江",
+			  			regions : [
+			  				{
+			  					name : "嘉兴",
+			  					regions : [
+			  						{
+			  							name : "南湖区"，
+			  							id : "1123445"
+			  						},
+			  						{}
+			  					
+			  					],
+			  					
+			  				},
+			  				{},
+			  			
+			  			],
+			  		},
+			  		{},
+			  	}
+			  	
+			  	
+			  }
+			
+			*/
+		</script>
+	</body>
+</html>
