@@ -53,13 +53,13 @@
 					var _this = this 
 					this.dom.onchange=function(){
 						selectVal = this.value
+						//发生改变清空低级别的select中原有的信息
+						for(var j=nextDom.lv;j<selArrObj.length;j++){
+							selArrObj[j].dom.innerHTML = "<option>"+selArrObj[j].tip+"</option>";
+						}
 						for(var i = 0; i < data.length; i++){
 							// 判断该级别数据中是否有自己选择的值
 							if(data[i].name ==selectVal  && data[i].sunList){
-								// 如果有清空低级别的select中原有的信息
-								for(var j=nextDom.lv;j<selArrObj.length;j++){
-									selArrObj[j].dom.innerHTML = "<option>"+selArrObj[j].tip+"</option>";
-								}
 								// 获取下一级别的数据塞入下一级别的option中
 								var nextData = data[i].sunList;
 								nextDom.appendOption(nextData)
