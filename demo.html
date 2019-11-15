@@ -54,7 +54,7 @@
 					this.dom.onchange=function(){
 						selectVal = this.value
 						//发生改变清空低级别的select中原有的信息
-						for(var j=nextDom.lv;j<selArrObj.length;j++){
+						for(var j=nextDom?nextDom.lv:selArrObj.length;j<selArrObj.length;j++){
 							selArrObj[j].dom.innerHTML = "<option>"+selArrObj[j].tip+"</option>";
 						}
 						for(var i = 0; i < data.length; i++){
